@@ -1,9 +1,13 @@
-package MediDATA;
+package MediDATA.MediDATA.src;
 
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Scanner;
-
-import static MediDATA.login.*;
+import java.nio.file.Files;
+import static MediDATA.MediDATA.src.login.*;
+import static MediDATA.MediDATA.src.login.nazwa;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class baza {
     public static void edytujBaze(String nazwa, String typ) throws IOException
@@ -51,7 +55,173 @@ public class baza {
 
             case "3": {
 
-            }// Tutaj Oskar musisz dać przejście do swojego menu które musisz stworzyć.
+                    System.out.println("Podaj numer PESEL pacjenta, u którego chcesz zmienić dane.");
+                    String zmieniany_pesel;
+                    zmieniany_pesel = s.nextLine();
+
+                    System.out.println("Jakie dane chcesz zmienić?");
+                    System.out.println("1. Zmiana adresu");
+                    System.out.println("2. Zmiana numeru telefonu");
+                    System.out.println("3. Dodawanie lub podgląd historii lecznia");
+                    System.out.println("4. Dodawanie leków");
+                    System.out.println("5. Powrót do menu");
+
+                    String choice3;
+                    choice3 = s.nextLine();
+
+                    switch(choice3)
+                    {
+                            case "1": {
+                                    if(!typ.equals("pielęgniarka")) {
+                                            System.out.println("Niewystarczające uprawnienia. Jeśli myślisz, że to błąd, skontaktuj się z administratorem.");
+                                            System.out.println("Naciśnij ENTER, aby kontynuować...");
+                                            s.nextLine();
+                                            edytujBaze(nazwa, wybranyTyp);
+                                    }
+                                    int linia_danych = ktoraLinia("pacjenci", zmieniany_pesel);
+
+                                    String dane = Czytaj_linie(linia_danych);
+
+                                    String lista_danych[] = dane.split(";");
+
+                                    System.out.println("Podaj nowy adres: ");
+
+                                    lista_danych[4] = s.nextLine();
+                                    String pesel = lista_danych[0];
+                                    zamienLinie(pesel, lista_danych);
+                                    System.out.println("Edycja danych pacjenta przebiegła pomyślnie!");
+                                    edytujBaze(nazwa,wybranyTyp);
+                                    break;
+                            }
+                            case "2":{
+                                    if(!typ.equals("pielęgniarka")) {
+                                            System.out.println("Niewystarczające uprawnienia. Jeśli myślisz, że to błąd, skontaktuj się z administratorem.");
+                                            System.out.println("Naciśnij ENTER, aby kontynuować...");
+                                            s.nextLine();
+                                            edytujBaze(nazwa, wybranyTyp);
+                                    }
+                                    int linia_danych = ktoraLinia("pacjenci", zmieniany_pesel);
+
+                                    String dane = Czytaj_linie(linia_danych);
+
+                                    String lista_danych[] = dane.split(";");
+
+                                    System.out.println("Podaj nowy numer telefonu: ");
+
+                                    lista_danych[5] = s.nextLine();
+                                    String pesel = lista_danych[0];
+                                    zamienLinie(pesel, lista_danych);
+                                    System.out.println("Edycja danych pacjenta przebiegła pomyślnie!");
+                                    edytujBaze(nazwa,wybranyTyp);
+                                    break;
+                            }
+                            case "3":{
+                                    if(!typ.equals("lekarz")) {
+                                            System.out.println("Niewystarczające uprawnienia. Jeśli myślisz, że to błąd, skontaktuj się z administratorem.");
+                                            System.out.println("Naciśnij ENTER, aby kontynuować...");
+                                            s.nextLine();
+                                            edytujBaze(nazwa,wybranyTyp);
+                                    }
+                                    System.out.println("Wybierz opcję:");
+                                    System.out.println("1. Nowa choroba");
+                                    System.out.println("2. Zakończenie leczenia");
+                                    System.out.println("3. Wyświetl historię leczenia");
+
+                                    String choice4 = s.nextLine();
+
+                                    switch(choice4) {
+                                            case "1": {
+                                                    int linia_danych = ktoraLinia("pacjenci", zmieniany_pesel);
+
+                                                    String dane = Czytaj_linie(linia_danych);
+
+                                                    String lista_danych[] = dane.split(";");
+                                                    System.out.println("Podaj nazwę choroby: ");
+                                                    String nowa_choroba = s.nextLine();
+                                                    System.out.println("Podaj datę rozpoznania chorby: ");
+                                                    String data_rozpoznania = s.nextLine();
+                                                    lista_danych[6] = data_rozpoznania + " - trwa -> " + nowa_choroba + "/";
+                                                    String pesel = lista_danych[0];
+                                                    zamienLinie(pesel, lista_danych);
+                                                    System.out.println("Edycja danych pacjenta przebiegła pomyślnie!");
+                                                    break;
+                                            }
+                                            case "2": {
+                                                    int linia_danych = ktoraLinia("pacjenci", zmieniany_pesel);
+
+                                                    String dane = Czytaj_linie(linia_danych);
+
+                                                    String lista_danych[] = dane.split(";");
+                                                    System.out.println("Dla której choroby chcesz wprowadzić zmianę: ");
+
+                                                    String choroby = lista_danych[6];
+                                                    String choroby_części[] = choroby.split("/");
+                                                    for(int i = 0;i<choroby_części.length;i++)
+                                                    System.out.println(i+1 +". "+ choroby_części[i]);
+                                                    String numer_choroby = s.nextLine();
+                                                    int choroba = Integer.parseInt(numer_choroby);
+                                                    String wybrana_choroba = choroby_części[choroba-1];
+                                                    String wybrana_części[] = wybrana_choroba.split(" ");
+                                                    System.out.println("Podaj datę zakończenia leczenia: ");
+                                                    String data_zakończenia = s.nextLine();
+                                                    wybrana_części[2] = data_zakończenia;
+                                                    String łączenie1 = "";
+                                                    for(int i=0;i<wybrana_części.length;i++)
+                                                            łączenie1 = łączenie1+wybrana_części[i] + " ";
+                                                    choroby_części[choroba-1] = łączenie1;
+                                                    String łączenie2 = "";
+                                                    for(int i =0; i<choroby_części.length;i++)
+                                                            łączenie2 = łączenie2 + choroby_części[i]+"/";
+                                                    lista_danych[6] = łączenie2;
+                                                    String pesel = lista_danych[0];
+                                                    zamienLinie(pesel, lista_danych);
+                                                    System.out.println("Edycja danych pacjenta przebiegła pomyślnie!");
+                                                    edytujBaze(nazwa,wybranyTyp);
+                                                    break;
+
+                                            }
+                                            case "3":{
+                                                    int linia_danych = ktoraLinia("pacjenci", zmieniany_pesel);
+
+                                                    String dane = Czytaj_linie(linia_danych);
+
+                                                    String lista_danych[] = dane.split(";");
+                                                    System.out.println(lista_danych[6]);
+                                                    System.out.println("Aby powrócić do menu kliknij przycisk enter.");
+                                                    String choice5 = s.nextLine();
+                                                    edytujBaze(nazwa, wybranyTyp);
+
+                                            }
+                                            } break;
+                                    }
+                            case "4":{
+                                    if(!typ.equals("lekarz")) {
+                                            System.out.println("Niewystarczające uprawnienia. Jeśli myślisz, że to błąd, skontaktuj się z administratorem.");
+                                            System.out.println("Naciśnij ENTER, aby kontynuować...");
+                                            s.nextLine();
+                                            edytujBaze(nazwa, wybranyTyp);
+                                    }
+                                    int linia_danych = ktoraLinia("pacjenci", zmieniany_pesel);
+
+                                    String dane = Czytaj_linie(linia_danych);
+
+                                    String lista_danych[] = dane.split(";");
+                                    System.out.println("Podaj nazwę i parametry dodawanego leku: ");
+
+                                    lista_danych[7] = lista_danych[7] + ", " +s.nextLine();
+                                    String pesel = lista_danych[0];
+                                    zamienLinie(pesel, lista_danych);
+                                    System.out.println("Edycja danych pacjenta przebiegła pomyślnie!");
+                                    break;
+                            }
+                            case "5":{
+                                    edytujBaze(nazwa, wybranyTyp);
+                                    break;
+                            }
+
+                    }
+
+            }
             case "4" : {
             System.exit(0);
             }
@@ -69,8 +239,10 @@ public class baza {
             FileWriter fw = new FileWriter(f,reset);
             PrintWriter pw = new PrintWriter(fw);
 
-            pw.println(text);                 			// Metoda, która służy do dopisywania tekstu do istniejącego pliku tekstowego
+            pw.println(text);// Metoda, która służy do dopisywania tekstu do istniejącego pliku tekstowego
+            pw.flush();
             pw.close();
+            fw.close();
             }
             catch(IOException e)
             {
@@ -93,8 +265,10 @@ public class baza {
             String adres = s.nextLine();
             System.out.println("Podaj numer telefonu pacjenta:");
             String telefon = s.nextLine();
+            String historia_leczenia = " ";
+            String historia_leków = " ";
 
-            saveToFile("pacjenci",pesel + ";" + data + ";" + imie + ";" + nazwisko + ";" + adres + ";" + telefon + ";" + ";",true);
+            saveToFile("pacjenci","\n" + pesel + ";" + data + ";" + imie + ";" + nazwisko + ";" + adres + ";" + telefon + ";" + historia_leczenia + ";" + historia_leków + ";" + ";",true);
 
             System.out.println("Dodano pacjenta!");
 
@@ -102,7 +276,7 @@ public class baza {
             }
     public static void removeRecord(String filepath,int deleteLine)
             {
-            String tempFile = "temp.txt";
+            String tempFile = "pacjenci.tmp";
             File oldFile = new File(filepath);
             File newFile = new File(tempFile);
 
@@ -128,11 +302,11 @@ public class baza {
             }
             }
             pw.flush();
+            fw.close();
+            bw.close();
             pw.close();
             fr.close();
             br.close();
-            bw.close();
-            fw.close();
 
             oldFile.delete();
             File dump = new File(filepath);
@@ -170,14 +344,13 @@ public class baza {
 
             while ((line = br.readLine()) != null)  // Metoda służąca do znalezienia konkretnej linii w której znajduje się podane słowo
             {
-            if(line.indexOf(pesel) >= 0)
+            if(line.contains(pesel))
             {
             szukana = obecna;
             }
             obecna++;
             }
             br.close();
-
             return szukana;
             }
     public static void usunPacjenta() throws IOException{
@@ -240,6 +413,43 @@ public class baza {
 
             edytujBaze(nazwa, wybranyTyp);
             }
-
+    public static String Czytaj_linie(int a) throws FileNotFoundException{
+            File plik = new File("pacjenci"); // obiekt przechowywujący dane z pliku tekstowego
+            Scanner in = new Scanner(plik); //odczyt danych
+            String zdanie;
+            for (int i = 0; i < a; i++)
+                    zdanie = in.nextLine();
+            String zdanie_docelowe = in.nextLine();
+            in.close();
+            return zdanie_docelowe;
+    }
+    public static void zamienLinie(String zmieniana, String[] lista) throws IOException {
+            String imie = lista[2];
+            String nazwisko = lista[3];
+            String data = lista[1];
+            String pesel = lista[0];
+            String adres = lista[4];
+            String telefon = lista[5];
+            String historia_leczenia = lista[6];
+            String historia_leków = lista[7];
+            String zamiennik = pesel + ";" + data + ";" + imie + ";" + nazwisko + ";" + adres + ";" + telefon + ";" + historia_leczenia + ";" + historia_leków + ";" + ";";
+            File inputFile = new File("pacjenci");
+            File tempFile = new File("pacjenci.tmp");
+            BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
+            String currentLine;
+            while((currentLine = reader.readLine()) != null) {
+                    String trimmedLine = currentLine.trim();
+                    if(trimmedLine.contains(zmieniana)) {
+                            writer.write(zamiennik + "\n");
+                        }
+                    else writer.write(currentLine + System.getProperty("line.separator"));
+            }
+            reader.close();
+            writer.close();
+            Path oldPath = Paths.get("pacjenci.tmp");
+            Path newPath = Paths.get("pacjenci");
+            Files.move(oldPath, newPath, REPLACE_EXISTING);
+        }
 
 }

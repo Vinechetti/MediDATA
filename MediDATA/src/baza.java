@@ -140,7 +140,7 @@ public class baza {
                                                     String nowa_choroba = s.nextLine();
                                                     System.out.println("Podaj datę rozpoznania chorby: ");
                                                     String data_rozpoznania = s.nextLine();
-                                                    lista_danych[6] = data_rozpoznania + " - trwa -> " + nowa_choroba + "/";
+                                                    lista_danych[6] = lista_danych[6] + data_rozpoznania + " - trwa -> " + nowa_choroba + "/";
                                                     String pesel = lista_danych[0];
                                                     zamienLinie(pesel, lista_danych);
                                                     System.out.println("Edycja danych pacjenta przebiegła pomyślnie!");
